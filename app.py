@@ -13,17 +13,22 @@ SCOPES = [
 ]
 
 def connect_sheet():
+    """
+    Uses SHEET_ID and SHEET_TAB from .streamlit/secrets.toml:
+      SHEET_ID = "..."
+      SHEET_TAB = "..."
+    """
     creds = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=SCOPES
     )
     gc = gspread.authorize(creds)
 
-    sheet_name = st.secrets["app"]["spreadsheet_name"]
-    ws_name = st.secrets["app"]["worksheet_name"]
+    sheet_id = st.secrets["SHEET_ID"]
+    tab_name = st.secrets["SHEET_TAB"]
 
-    sh = gc.open(sheet_name)
-    ws = sh.worksheet(ws_name)
+    sh = gc.open_by_key(sheet_id)
+    ws = sh.worksheet(tab_name)
     return ws
 
 def append_row_safe(ws, data: dict):
@@ -43,7 +48,7 @@ FREQ = ["Never", "Rarely", "Sometimes", "Often", "Always"]
 
 # ================== APP HEADER ==================
 st.title("MSS Committees Questionnaire")
-st.caption("Responses will be appended as a new row in the connected Google Sheet.")
+st.caption("Responses will be appended as a new row in the connected Google Sheet (by SHEET_ID + SHEET_TAB).")
 
 # ================== FORM ==================
 with st.form("mss_committees_form", clear_on_submit=True):
@@ -85,13 +90,11 @@ with st.form("mss_committees_form", clear_on_submit=True):
     )
 
     q06_market_need = st.radio(
-        "6. Our standard development is driven by documented market needs "
-        "(incl. RMK-12/13, NIMP 2030, i-ESG).",
+        "6. Our standard development is driven by documented market needs (incl. RMK-12/13, NIMP 2030, i-ESG).",
         LIKERT, horizontal=True
     )
     q07_regulatory_need = st.radio(
-        "7. Our standard development is driven by documented regulatory needs "
-        "(incl. RMK-12/13, NIMP 2030, i-ESG).",
+        "7. Our standard development is driven by documented regulatory needs (incl. RMK-12/13, NIMP 2030, i-ESG).",
         LIKERT, horizontal=True
     )
     q08_consult_regulators_early = st.radio(
@@ -103,12 +106,11 @@ with st.form("mss_committees_form", clear_on_submit=True):
         LIKERT, horizontal=True
     )
     q10_msme_inclusivity = st.radio(
-        "10. Our standard development we ensure stakeholder involve mapping ensures MSME inclusivity "
-        "and downstream adoption.",
+        "10. Our standard development we ensure Stakeholder involve mapping ensures MSME inclusivity and downstream adoption.",
         LIKERT, horizontal=True
     )
     q11_cross_agency_coherence = st.radio(
-        "11. Our standard development, we ensure cross-agency coherence.",
+        "11. Our standard development, we ensure Cross-agency coherence.",
         LIKERT, horizontal=True
     )
 
@@ -118,9 +120,8 @@ with st.form("mss_committees_form", clear_on_submit=True):
 
     st.caption(
         "This section evaluates resource sufficiency (secretariat, experts, budget), digital tooling, and the "
-        "efficiency of key process stages (proposal, drafting, public comment, consensus, editing). "
-        "This section diagnoses process bottlenecks and identifies leverage points for cycle-time reduction "
-        "without compromising quality."
+        "efficiency of key process stages (proposal, drafting, public comment, consensus, editing). This section "
+        "diagnoses process bottlenecks and identifies leverage points for cycle-time reduction without compromising quality."
     )
 
     q12_fast_enough = st.radio(
@@ -157,9 +158,8 @@ with st.form("mss_committees_form", clear_on_submit=True):
     st.subheader("SECTION D – QUALITY, CLARITY & IMPLEMENTABILITY")
 
     st.caption(
-        "This section assesses the provision of implementation aids (e.g., sector notes, examples, checklists) and "
-        "appraisal of downstream costs. This section also considers translation, catalogue metadata, and API readiness "
-        "to support discoverability and uptake."
+        "This section assesses the provision of implementation aids (e.g., sector notes, examples, checklists) and appraisal "
+        "of downstream costs. This section also considers translation, catalogue metadata, and API readiness to support discoverability and uptake."
     )
 
     q19_implementable_no_burden = st.radio(
@@ -188,10 +188,9 @@ with st.form("mss_committees_form", clear_on_submit=True):
     st.subheader("SECTION E – EVIDENCE USE & IMPACT")
 
     st.caption(
-        "This section examines the use of macro/meso evidence (productivity, exports, TFP) in prioritisation and the "
-        "systematic capture of post-publication usage metrics (sales, citations, regulatory referencing). "
-        "This section checks for ex-post portfolio hygiene (retire/merge/update low-use standards) and quantified case studies. "
-        "This section embeds continuous improvement logic into our standards development."
+        "This section examines the use of macro/meso evidence (productivity, exports, TFP) in prioritisation and the systematic capture "
+        "of post-publication usage metrics (sales, citations, regulatory referencing). This section checks for ex-post portfolio hygiene "
+        "(retire/merge/update low-use standards) and quantified case studies. This section embeds continuous improvement logic into our standards development."
     )
 
     q24_macro_meso_evidence = st.radio(
@@ -227,7 +226,7 @@ with st.form("mss_committees_form", clear_on_submit=True):
         LIKERT, horizontal=True
     )
     q32_consumer_protection = st.radio(
-        "32. MS have strengthened consumer protection.",
+        "32. MS have strengthened consumer protection",
         LIKERT, horizontal=True
     )
     q33_reference_enforcement = st.radio(
@@ -239,7 +238,7 @@ with st.form("mss_committees_form", clear_on_submit=True):
         LIKERT, horizontal=True
     )
     q35_reduce_regulator_burden = st.radio(
-        "35. MS help reduce the burden on regulators by creating clearer compliance expectations.",
+        "35. MS help reduce the burden on regulators by creating clearer compliance expectations",
         LIKERT, horizontal=True
     )
 
@@ -276,7 +275,7 @@ with st.form("mss_committees_form", clear_on_submit=True):
         LIKERT, horizontal=True
     )
     q42_translation_support = st.radio(
-        "42. Translation support is adequate to produce accurate and timely bilingual outputs.",
+        "42. Translation support is adequate to produce accurate and timely bilingual outputs",
         LIKERT, horizontal=True
     )
     q43_training_capacity = st.radio(
